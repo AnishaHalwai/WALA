@@ -11,6 +11,7 @@ package com.ibm.wala.cast.java.test;/*
 
 import com.ibm.wala.cast.ir.ssa.AstIRFactory;
 import com.ibm.wala.cast.java.client.impl.ZeroOneContainerCFABuilderFactory;
+import com.ibm.wala.cast.java.intra.NullPointerState;
 import com.ibm.wala.cast.java.ipa.callgraph.JavaSourceAnalysisScope;
 import com.ibm.wala.cast.java.translator.jdt.ecj.ECJClassLoaderFactory;
 import com.ibm.wala.cast.java.ExceptionPruningAnalysis;
@@ -320,5 +321,9 @@ public class NullPointerExceptionInterTest {
         interExplodedCFG.getResult(callNode);
 
     Assert.assertTrue(intraExplodedCFG.hasExceptions());
+    intraExplodedCFG.getCFG().forEach(bb -> {
+      NullPointerState s = intraExplodedCFG.getState(bb);
+      System.err.println(s.toString());
+    });
   }
 }

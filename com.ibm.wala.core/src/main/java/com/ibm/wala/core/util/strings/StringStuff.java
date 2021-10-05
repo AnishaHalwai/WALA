@@ -24,6 +24,7 @@ import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.TypeName;
 import com.ibm.wala.types.TypeReference;
 import com.ibm.wala.util.collections.HashMapFactory;
+import com.sun.tools.javac.code.Attribute.Class;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -528,12 +529,15 @@ public class StringStuff {
    * @param methodSig something like "java_cup.lexer.advance()V"
    * @throws IllegalArgumentException if methodSig is null
    */
-  public static MethodReference makeMethodReference(String methodSig)
+  public static MethodReference makeMethodReference(String methodSig, ClassLoaderReference ref)
       throws IllegalArgumentException {
-    return makeMethodReference(Language.JAVA, methodSig);
+    return makeMethodReference(Language.JAVA, methodSig, ref);
   }
-
-  public static MethodReference makeMethodReference(Language l, String methodSig)
+  public static MethodReference makeMethodReference(String methodSig)
+  {
+      return makeMethodReference(methodSig, ClassLoaderReference.Application);
+  }
+  public static MethodReference makeMethodReference(Language l, String methodSig, ClassLoaderReference ref)
       throws IllegalArgumentException {
     if (methodSig == null) {
       throw new IllegalArgumentException("methodSig is null");
@@ -543,7 +547,7 @@ public class StringStuff {
     }
     String type = methodSig.substring(0, methodSig.lastIndexOf('.'));
     type = deployment2CanonicalTypeString(type);
-    TypeReference t = TypeReference.findOrCreate(ClassLoaderReference.Application, type);
+    TypeReference t = TypeReference.findOrCreate(ref, type);
 
     String methodName = methodSig.substring(methodSig.lastIndexOf('.') + 1, methodSig.indexOf('('));
     String desc = methodSig.substring(methodSig.indexOf('('));

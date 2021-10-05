@@ -25,6 +25,7 @@ import com.ibm.wala.ssa.ISSABasicBlock;
 import com.ibm.wala.ssa.SSACFG;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAOptions;
+import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.util.debug.Assertions;
 import com.ibm.wala.util.graph.GraphIntegrity;
@@ -54,7 +55,7 @@ public abstract class CFGTest extends WalaTestCase {
   /** Build an IR, then check integrity on two flavors of CFG */
   private void doMethod(String methodSig) {
     try {
-      MethodReference mr = StringStuff.makeMethodReference(Language.JAVA, methodSig);
+      MethodReference mr = StringStuff.makeMethodReference(Language.JAVA, methodSig, ClassLoaderReference.Application);
 
       IMethod m = cha.resolveMethod(mr);
       if (m == null) {
@@ -99,7 +100,7 @@ public abstract class CFGTest extends WalaTestCase {
 
   @Test
   public void testIRCacheIdempotence() {
-    MethodReference mr = StringStuff.makeMethodReference("hello.Hello.main([Ljava/lang/String;)V");
+    MethodReference mr = StringStuff.makeMethodReference("hello.Hello.main([Ljava/lang/String;)V", ClassLoaderReference.Application);
 
     IMethod m = cha.resolveMethod(mr);
     IAnalysisCacheView cache = makeAnalysisCache();
@@ -115,7 +116,7 @@ public abstract class CFGTest extends WalaTestCase {
 
   @Test
   public void testSync1() {
-    MethodReference mr = StringStuff.makeMethodReference("cfg.MonitorTest.sync1()V");
+    MethodReference mr = StringStuff.makeMethodReference("cfg.MonitorTest.sync1()V", ClassLoaderReference.Application);
 
     IMethod m = cha.resolveMethod(mr);
     IAnalysisCacheView cache = makeAnalysisCache();
@@ -128,7 +129,7 @@ public abstract class CFGTest extends WalaTestCase {
 
   @Test
   public void testSync2() {
-    MethodReference mr = StringStuff.makeMethodReference("cfg.MonitorTest.sync2()V");
+    MethodReference mr = StringStuff.makeMethodReference("cfg.MonitorTest.sync2()V", ClassLoaderReference.Application);
 
     IMethod m = cha.resolveMethod(mr);
     IAnalysisCacheView cache = makeAnalysisCache();
@@ -143,7 +144,7 @@ public abstract class CFGTest extends WalaTestCase {
 
   @Test
   public void testSync3() {
-    MethodReference mr = StringStuff.makeMethodReference("cfg.MonitorTest.sync3()V");
+    MethodReference mr = StringStuff.makeMethodReference("cfg.MonitorTest.sync3()V", ClassLoaderReference.Application);
 
     IMethod m = cha.resolveMethod(mr);
     IAnalysisCacheView cache = makeAnalysisCache();

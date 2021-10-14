@@ -58,13 +58,18 @@ public class CallFieldAccess {
   }
 
   static B callGetException() {
+    //make a b
     B b = new B();
+    //return testGet for b
     return FieldAccess.testGet(unknown, b);
   }
 
   static B callDynamicGetException() {
+    //make a field access dynamic
     FieldAccessDynamic fad = new FieldAccessDynamic();
+    //make a b
     B b = new B();
+    //return testGet
     return fad.testGet(unknown, b);
   }
 }

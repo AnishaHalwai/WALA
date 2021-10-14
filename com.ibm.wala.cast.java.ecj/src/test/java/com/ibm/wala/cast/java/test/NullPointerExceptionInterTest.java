@@ -12,12 +12,16 @@ package com.ibm.wala.cast.java.test;/*
 import com.ibm.wala.cast.ir.ssa.AstIRFactory;
 import com.ibm.wala.cast.java.client.impl.ZeroOneContainerCFABuilderFactory;
 import com.ibm.wala.cast.java.intra.NullPointerState;
+import com.ibm.wala.cast.java.intra.NullPointerState.State;
 import com.ibm.wala.cast.java.ipa.callgraph.JavaSourceAnalysisScope;
 import com.ibm.wala.cast.java.translator.jdt.ecj.ECJClassLoaderFactory;
 import com.ibm.wala.cast.java.ExceptionPruningAnalysis;
 import com.ibm.wala.cast.java.InterprocAnalysisResult;
 import com.ibm.wala.cast.java.NullPointerAnalysis;
 import com.ibm.wala.cast.java.intra.IntraprocNullPointerAnalysis;
+import com.ibm.wala.cast.loader.AstMethod;
+import com.ibm.wala.cast.tree.CAstSourcePositionMap.Position;
+import com.ibm.wala.cast.util.SourceBuffer;
 import com.ibm.wala.classLoader.ClassLoaderFactory;
 import com.ibm.wala.classLoader.ClassLoaderFactoryImpl;
 import com.ibm.wala.classLoader.SourceDirectoryTreeModule;
@@ -38,6 +42,9 @@ import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
 import com.ibm.wala.properties.WalaProperties;
+import com.ibm.wala.ssa.DefUse;
+import com.ibm.wala.ssa.IR;
+import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.ssa.SSAOptions;
 import com.ibm.wala.ssa.SymbolTable;
@@ -49,6 +56,8 @@ import com.ibm.wala.util.NullProgressMonitor;
 import com.ibm.wala.util.WalaException;
 import com.ibm.wala.util.graph.GraphIntegrity.UnsoundGraphException;
 import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.jar.JarFile;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -155,6 +164,7 @@ public class NullPointerExceptionInterTest {
     Assert.assertTrue(intraExplodedCFG.hasExceptions());
   }
 
+  @Ignore
   @Test
   public void testDynamicIfException()
       throws UnsoundGraphException, CancelException, WalaException {
@@ -174,6 +184,7 @@ public class NullPointerExceptionInterTest {
     Assert.assertTrue(intraExplodedCFG.hasExceptions());
   }
 
+  @Ignore
   @Test
   public void testIfNoException() throws UnsoundGraphException, CancelException, WalaException {
     MethodReference mr =
@@ -287,7 +298,7 @@ public class NullPointerExceptionInterTest {
   }
 
   @Test
-  public void testGetException() throws UnsoundGraphException, CancelException, WalaException {
+  public void testGetException() throws UnsoundGraphException, CancelException, WalaException, IOException {
     MethodReference mr =
         StringStuff.makeMethodReference(
             "cfg.exc.inter.CallFieldAccess.callGetException()Lcfg/exc/intra/B",JavaSourceAnalysisScope.SOURCE);
@@ -302,11 +313,12 @@ public class NullPointerExceptionInterTest {
         interExplodedCFG.getResult(callNode);
 
     Assert.assertTrue(intraExplodedCFG.hasExceptions());
+    printStuff(callNode, intraExplodedCFG);
   }
 
   @Test
   public void testDynamicGetException()
-      throws UnsoundGraphException, CancelException, WalaException {
+      throws UnsoundGraphException, CancelException, WalaException, IOException {
     MethodReference mr =
         StringStuff.makeMethodReference(
             "cfg.exc.inter.CallFieldAccess.callDynamicGetException()Lcfg/exc/intra/B",JavaSourceAnalysisScope.SOURCE);
@@ -321,9 +333,63 @@ public class NullPointerExceptionInterTest {
         interExplodedCFG.getResult(callNode);
 
     Assert.assertTrue(intraExplodedCFG.hasExceptions());
-    intraExplodedCFG.getCFG().forEach(bb -> {
-      NullPointerState s = intraExplodedCFG.getState(bb);
-      System.err.println(s.toString());
-    });
+
+    printStuff(callNode, intraExplodedCFG);
+
+
+      }
+
+    public void printStuff(CGNode callNode,ExceptionPruningAnalysis<SSAInstruction, IExplodedBasicBlock> intraExplodedCFG )
+    throws IOException{
+      IR ir = callNode.getIR();
+      DefUse du = callNode.getDU();
+      SymbolTable st = ir.getSymbolTable();
+
+      for(int i=1; i<=st.getMaxValueNumber(); i++)
+      {
+        SSAInstruction inst = du.getDef(i);
+
+        if(inst!=null && inst.getDef()!=-1)
+        {
+          IExplodedBasicBlock bb = intraExplodedCFG.getCFG().getBlockForInstruction(inst.iIndex());
+          State s = intraExplodedCFG.getState(bb).getState(inst.getDef());
+
+          AstMethod asm = (AstMethod)callNode.getMethod();
+          String[][] names = asm.debugInfo().getSourceNamesForValues();
+          System.err.println("" + Arrays.toString(names[inst.getDef()]) + new SourceBuffer(
+              asm.debugInfo().getInstructionPosition(inst.iIndex())) +" "+ s);
+          if(inst instanceof SSAAbstractInvokeInstruction)
+          {
+            SSAAbstractInvokeInstruction saa = (SSAAbstractInvokeInstruction)inst;
+
+            for(int j=0;j<saa.getNumberOfPositionalParameters();j++)
+            {
+              Position p = asm.debugInfo().getOperandPosition(inst.iIndex(),j);
+              System.err.println(""+new SourceBuffer(p));
+            }
+            System.err.println("-------------");
+            System.err.println(asm.debugInfo().getLeadingComment(inst.iIndex()));
+            System.err.println("-------------");
+          }
+      }
+//      AstMethod asm2 = (AstMethod)callNode.getMethod();
+//      String[][] names2 = asm2.debugInfo().
+    }
+//    intraExplodedCFG.getCFG().forEach(bb -> {
+//      NullPointerState s = intraExplodedCFG.getState(bb);
+//      System.err.println(s.toString());
+//    });
+
   }
+
 }
+//TODO 0:
+//explore:
+// what else in debugInfo, anything useful?
+// []fad.testGet(unknown, b) BOTH
+// list of args 0: fad, 1:unknown, 2:b
+// debugInfo has method to get args --- explore?!?!
+// getOperandPosition(instruction index, operand index (0,1,2))
+
+//TODO 1:
+//create method extractComment: parameter: string chunk, returns: list of comment strings

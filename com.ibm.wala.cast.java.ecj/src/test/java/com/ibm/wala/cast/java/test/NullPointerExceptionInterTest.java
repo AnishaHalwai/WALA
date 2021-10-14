@@ -58,6 +58,8 @@ import com.ibm.wala.util.graph.GraphIntegrity.UnsoundGraphException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Vector;
 import java.util.jar.JarFile;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -78,6 +80,7 @@ public class NullPointerExceptionInterTest {
   private static CallGraph cg;
 
   private static IAnalysisCacheView cache;
+
 
   protected static ClassLoaderFactory getLoaderFactory(AnalysisScope scope) {
     return new ECJClassLoaderFactory(scope.getExclusions());
@@ -339,7 +342,7 @@ public class NullPointerExceptionInterTest {
 
       }
 
-    public void printStuff(CGNode callNode,ExceptionPruningAnalysis<SSAInstruction, IExplodedBasicBlock> intraExplodedCFG )
+  public void printStuff(CGNode callNode,ExceptionPruningAnalysis<SSAInstruction, IExplodedBasicBlock> intraExplodedCFG )
     throws IOException{
       IR ir = callNode.getIR();
       DefUse du = callNode.getDU();
@@ -367,9 +370,16 @@ public class NullPointerExceptionInterTest {
               Position p = asm.debugInfo().getOperandPosition(inst.iIndex(),j);
               System.err.println(""+new SourceBuffer(p));
             }
-            System.err.println("-------------");
-            System.err.println(asm.debugInfo().getLeadingComment(inst.iIndex()));
-            System.err.println("-------------");
+            System.err.println("------code to test extractComments-------");
+//            System.err.println(asm.debugInfo().getLeadingComment(inst.iIndex()));
+              List<String> output = extractComment(asm.debugInfo().getLeadingComment(inst.iIndex()));
+              System.err.println("Comments: ");
+              for(int k=0;k<output.size();k++)
+              {
+                System.err.println(output.get(k));
+              }
+              System.err.println();
+            System.err.println("-----------------------------------------");
           }
       }
 //      AstMethod asm2 = (AstMethod)callNode.getMethod();
@@ -380,6 +390,43 @@ public class NullPointerExceptionInterTest {
 //      System.err.println(s.toString());
 //    });
 
+  }
+  public List<String> extractComment(String allInstructions)
+  {
+    //focusing on extracting comments starting with '//'
+    // index i = find first occurence of '\\'
+    // if found, find first occurence of next line,
+    // if not found, break
+    // index j =if next line not found, return whole string after '\\', break
+    // store that substring[i to j] in list
+    // repeat with allInstructions = allInstructions[j:]
+
+    List<String> allComments = new Vector<String>();
+
+    while(true)
+    {
+      if(allInstructions.length()<=2) break;
+
+      int i = allInstructions.indexOf("//");
+      if(i==-1) {
+//        System.err.println("no comments found\n");
+        break;
+      }
+
+      int j = allInstructions.indexOf("\n",i);
+      if(j==-1) {
+        allComments.add(allInstructions);
+        System.err.println(allInstructions);
+        break;
+      }
+      allComments.add(allInstructions.substring(i,j));
+      System.err.println(allInstructions.substring(i,j));
+      allInstructions = allInstructions.substring(j+1);
+
+
+    }
+
+    return allComments;
   }
 
 }

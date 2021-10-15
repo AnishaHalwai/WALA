@@ -11,14 +11,14 @@
 
 package com.ibm.wala.cast.java.inter;
 
-import com.ibm.wala.cast.java.intra.MethodState;
-import com.ibm.wala.cast.java.intra.NullPointerState;
-import com.ibm.wala.cast.java.intra.ParameterState;
-import com.ibm.wala.cfg.ControlFlowGraph;
 import com.ibm.wala.cast.java.ExceptionPruningAnalysis;
 import com.ibm.wala.cast.java.InterprocAnalysisResult;
 import com.ibm.wala.cast.java.NullPointerAnalysis;
+import com.ibm.wala.cast.java.intra.MethodState;
+import com.ibm.wala.cast.java.intra.NullPointerState;
 import com.ibm.wala.cast.java.intra.NullPointerState.State;
+import com.ibm.wala.cast.java.intra.ParameterState;
+import com.ibm.wala.cfg.ControlFlowGraph;
 import com.ibm.wala.core.util.strings.Atom;
 import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ipa.callgraph.CallGraph;

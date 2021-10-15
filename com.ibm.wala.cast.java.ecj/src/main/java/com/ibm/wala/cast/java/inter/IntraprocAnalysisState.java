@@ -11,9 +11,9 @@
 
 package com.ibm.wala.cast.java.inter;
 
+import com.ibm.wala.cast.java.ExceptionPruningAnalysis;
 import com.ibm.wala.cast.java.intra.NullPointerState;
 import com.ibm.wala.cfg.ControlFlowGraph;
-import com.ibm.wala.cast.java.ExceptionPruningAnalysis;
 import com.ibm.wala.ipa.callgraph.CGNode;
 import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
 import com.ibm.wala.ssa.SSAInstruction;

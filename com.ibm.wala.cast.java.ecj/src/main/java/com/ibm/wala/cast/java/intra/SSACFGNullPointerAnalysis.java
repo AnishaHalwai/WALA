@@ -11,8 +11,8 @@
 
 package com.ibm.wala.cast.java.intra;
 
-import com.ibm.wala.cfg.ControlFlowGraph;
 import com.ibm.wala.cast.java.ExceptionPruningAnalysis;
+import com.ibm.wala.cfg.ControlFlowGraph;
 import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.ISSABasicBlock;
 import com.ibm.wala.ssa.SSAInstruction;

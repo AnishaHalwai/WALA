@@ -24,7 +24,6 @@ import com.ibm.wala.types.MethodReference;
 import com.ibm.wala.types.TypeName;
 import com.ibm.wala.types.TypeReference;
 import com.ibm.wala.util.collections.HashMapFactory;
-import com.sun.tools.javac.code.Attribute.Class;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -533,12 +532,13 @@ public class StringStuff {
       throws IllegalArgumentException {
     return makeMethodReference(Language.JAVA, methodSig, ref);
   }
-  public static MethodReference makeMethodReference(String methodSig)
-  {
-      return makeMethodReference(methodSig, ClassLoaderReference.Application);
+
+  public static MethodReference makeMethodReference(String methodSig) {
+    return makeMethodReference(methodSig, ClassLoaderReference.Application);
   }
-  public static MethodReference makeMethodReference(Language l, String methodSig, ClassLoaderReference ref)
-      throws IllegalArgumentException {
+
+  public static MethodReference makeMethodReference(
+      Language l, String methodSig, ClassLoaderReference ref) throws IllegalArgumentException {
     if (methodSig == null) {
       throw new IllegalArgumentException("methodSig is null");
     }

@@ -11,9 +11,9 @@
 
 package com.ibm.wala.cast.java;
 
+import com.ibm.wala.cast.java.intra.NullPointerState;
 import com.ibm.wala.cfg.ControlFlowGraph;
 import com.ibm.wala.cfg.IBasicBlock;
-import com.ibm.wala.cast.java.intra.NullPointerState;
 import com.ibm.wala.util.CancelException;
 import com.ibm.wala.util.MonitorUtil.IProgressMonitor;
 import com.ibm.wala.util.graph.GraphIntegrity.UnsoundGraphException;

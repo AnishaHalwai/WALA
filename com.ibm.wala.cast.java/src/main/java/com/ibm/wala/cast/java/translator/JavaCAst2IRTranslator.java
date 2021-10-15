@@ -40,9 +40,12 @@ import com.ibm.wala.types.TypeName;
 import com.ibm.wala.types.TypeReference;
 import com.ibm.wala.util.config.SetOfClasses;
 import com.ibm.wala.util.debug.Assertions;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 public class JavaCAst2IRTranslator extends AstTranslator {
   private final CAstEntity fSourceEntity;
@@ -356,18 +359,99 @@ public class JavaCAst2IRTranslator extends AstTranslator {
       symtab.getConstant(0);
       symtab.getNullConstant();
 
+      DebuggingInformation dbg =
+          new DebuggingInformation() {
+            @Override
+            public Position getCodeBodyPosition() {
+              return debugInfo.getCodeBodyPosition();
+            }
+
+            @Override
+            public Position getCodeNamePosition() {
+              return debugInfo.getCodeNamePosition();
+            }
+
+            @Override
+            public Position getInstructionPosition(int instructionOffset) {
+              return debugInfo.getInstructionPosition(instructionOffset);
+            }
+
+            @Override
+            public String[][] getSourceNamesForValues() {
+              return debugInfo.getSourceNamesForValues();
+            }
+
+            @Override
+            public Position getOperandPosition(int instructionOffset, int operand) {
+              return debugInfo.getOperandPosition(instructionOffset, operand);
+            }
+
+            @Override
+            public Position getParameterPosition(int param) {
+              return debugInfo.getParameterPosition(param);
+            }
+
+            @Override
+            public String getLeadingComment(int instructionOffset) throws IOException {
+              String str = debugInfo.getLeadingComment(instructionOffset);
+              List<String> allComments = extractComment(str);
+              if (allComments.size() == 1) {
+                return allComments.get(0);
+              } else {
+                return allComments.toString();
+              }
+            }
+
+            @Override
+            public String getFollowingComment(int instructionOffset) throws IOException {
+              String str = debugInfo.getFollowingComment(instructionOffset);
+              List<String> allComments = extractComment(str);
+              if (allComments.size() == 1) {
+                return allComments.get(0);
+              } else {
+                return allComments.toString();
+              }
+            }
+          };
+
       ((JavaSourceLoaderImpl) loader)
           .defineFunction(
-              N,
-              owner,
-              cfg,
-              symtab,
-              hasCatchBlock,
-              caughtTypes,
-              hasMonitorOp,
-              lexicalInfo,
-              debugInfo);
+              N, owner, cfg, symtab, hasCatchBlock, caughtTypes, hasMonitorOp, lexicalInfo, dbg);
     }
+  }
+
+  public List<String> extractComment(String allInstructions) {
+    // focusing on extracting comments starting with '//'
+    // index i = find first occurence of '\\'
+    // if found, find first occurence of next line,
+    // if not found, break
+    // index j =if next line not found, return whole string after '\\', break
+    // store that substring[i to j] in list
+    // repeat with allInstructions = allInstructions[j:]
+
+    List<String> allComments = new Vector<>();
+
+    while (true) {
+      if (allInstructions.length() <= 2) break;
+
+      int i = allInstructions.indexOf("//");
+      if (i == -1) {
+        //        System.err.println("no comments found\n");
+        break;
+      }
+
+      int j = allInstructions.indexOf("\n", i);
+      if (j == -1) {
+        allComments.add(allInstructions);
+        System.err.println(allInstructions);
+        break;
+      }
+      allComments.add(allInstructions.substring(i, j));
+      //      System.err.println(allInstructions.substring(i,j));
+      allInstructions = allInstructions.substring(j + 1);
+    }
+
+    return allComments;
   }
 
   @Override

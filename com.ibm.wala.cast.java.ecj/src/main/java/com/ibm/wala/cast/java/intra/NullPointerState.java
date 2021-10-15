@@ -265,8 +265,7 @@ public class NullPointerState extends AbstractVariable<NullPointerState> {
      * @see com.ibm.wala.fixedpoint.impl.AbstractOperator#evaluate(com.ibm.wala.fixpoint.IVariable, com.ibm.wala.fixpoint.IVariable[])
      */
     @Override
-    public byte evaluate(
-        NullPointerState lhs, NullPointerState[] rhs) {
+    public byte evaluate(NullPointerState lhs, NullPointerState[] rhs) {
       boolean changed = false;
 
       // meet rhs first
@@ -312,8 +311,7 @@ public class NullPointerState extends AbstractVariable<NullPointerState> {
     }
 
     @Override
-    public byte evaluate(
-        NullPointerState lhs, NullPointerState rhs) {
+    public byte evaluate(NullPointerState lhs, NullPointerState rhs) {
       boolean changed = false;
       if (!lhs.equals(rhs)) {
         lhs.copyState(rhs);
@@ -390,8 +388,7 @@ public class NullPointerState extends AbstractVariable<NullPointerState> {
      * @see com.ibm.wala.fixedpoint.impl.UnaryOperator#evaluate(com.ibm.wala.fixpoint.IVariable, com.ibm.wala.fixpoint.IVariable)
      */
     @Override
-    public byte evaluate(
-        NullPointerState lhs, NullPointerState rhs) {
+    public byte evaluate(NullPointerState lhs, NullPointerState rhs) {
       byte state = FixedPointConstants.NOT_CHANGED;
 
       if (!lhs.equals(rhs)) {
@@ -444,8 +441,7 @@ public class NullPointerState extends AbstractVariable<NullPointerState> {
      * @see com.ibm.wala.fixedpoint.impl.UnaryOperator#evaluate(com.ibm.wala.fixpoint.IVariable, com.ibm.wala.fixpoint.IVariable)
      */
     @Override
-    public byte evaluate(
-        NullPointerState lhs, NullPointerState rhs) {
+    public byte evaluate(NullPointerState lhs, NullPointerState rhs) {
       byte state = FixedPointConstants.NOT_CHANGED;
 
       if (!lhs.equals(rhs)) {
@@ -495,8 +491,7 @@ public class NullPointerState extends AbstractVariable<NullPointerState> {
      * @see com.ibm.wala.fixedpoint.impl.UnaryOperator#evaluate(com.ibm.wala.fixpoint.IVariable, com.ibm.wala.fixpoint.IVariable)
      */
     @Override
-    public byte evaluate(
-        NullPointerState lhs, NullPointerState rhs) {
+    public byte evaluate(NullPointerState lhs, NullPointerState rhs) {
       if (lhs.equals(rhs)) {
         return FixedPointConstants.NOT_CHANGED;
       } else {

@@ -31,7 +31,6 @@ import com.ibm.wala.ssa.SSAGetInstruction;
 import com.ibm.wala.ssa.SSAGotoInstruction;
 import com.ibm.wala.ssa.SSAInstanceofInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
-import com.ibm.wala.ssa.SSAInstruction.IVisitor;
 import com.ibm.wala.ssa.SSAInvokeInstruction;
 import com.ibm.wala.ssa.SSALoadMetadataInstruction;
 import com.ibm.wala.ssa.SSAMonitorInstruction;
@@ -203,7 +202,8 @@ public class IntraprocNullPointerAnalysis<T extends ISSABasicBlock> {
     }
   }
 
-  private class NegativeCFGBuilderVisitor implements com.ibm.wala.cast.java.ssa.AstJavaInstructionVisitor {
+  private class NegativeCFGBuilderVisitor
+      implements com.ibm.wala.cast.java.ssa.AstJavaInstructionVisitor {
 
     private final Graph<T> deleted;
 
@@ -474,8 +474,6 @@ public class IntraprocNullPointerAnalysis<T extends ISSABasicBlock> {
     }
 
     @Override
-    public void visitEnclosingObjectReference(EnclosingObjectReference inst) {
-
-    }
+    public void visitEnclosingObjectReference(EnclosingObjectReference inst) {}
   }
 }

@@ -379,6 +379,7 @@ public class NullPointerExceptionInterTest {
             System.err.println("" + new SourceBuffer(p));
           }
         }
+        System.err.println(""+ir.getMethod());
         ir.iterateAllInstructions()
             .forEachRemaining(
                 inst2 -> {
@@ -391,31 +392,28 @@ public class NullPointerExceptionInterTest {
 
                       String str = asm.debugInfo().getFollowingComment(pind);
                       String str2 = asm.debugInfo().getLeadingComment(pind);
+
+                      System.err.println(""+inst2);
                       System.err.println(""+ new SourceBuffer(asm.debugInfo().getInstructionPosition(pind)));
                       System.err.println("Following at: "+pind+" "+str);
                       System.err.println("Leading at: "+pind+" "+str2);
                     } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 });
       }
-      //      AstMethod asm2 = (AstMethod)callNode.getMethod();
-      //      String[][] names2 = asm2.debugInfo().
     }
-    //    intraExplodedCFG.getCFG().forEach(bb -> {
-    //      NullPointerState s = intraExplodedCFG.getState(bb);
-    //      System.err.println(s.toString());
-    //    });
-
   }
-
+  
   public List<String> extractComment(String allInstructions) {
-    // focusing on extracting comments starting with '//'
-    // index i = find first occurence of '\\'
-    // if found, find first occurence of next line,
-    // if not found, break
-    // index j =if next line not found, return whole string after '\\', break
-    // store that substring[i to j] in list
-    // repeat with allInstructions = allInstructions[j:]
+    /* focusing on extracting comments starting with '//'
+     index i = find first occurence of '\\'
+     if found, find first occurence of next line,
+     if not found, break
+     index j =if next line not found, return whole string after '\\', break
+     store that substring[i to j] in list
+     repeat with allInstructions = allInstructions[j:]
+     */
 
     List<String> allComments = new Vector<>();
 
@@ -424,7 +422,6 @@ public class NullPointerExceptionInterTest {
 
       int i = allInstructions.indexOf("//");
       if (i == -1) {
-        //        System.err.println("no comments found\n");
         break;
       }
 
@@ -435,20 +432,24 @@ public class NullPointerExceptionInterTest {
         break;
       }
       allComments.add(allInstructions.substring(i, j));
-      //      System.err.println(allInstructions.substring(i,j));
       allInstructions = allInstructions.substring(j + 1);
     }
 
     return allComments;
   }
-}
-// TODO 0:
-// explore:
-// what else in debugInfo, anything useful?
-// []fad.testGet(unknown, b) BOTH
-// list of args 0: fad, 1:unknown, 2:b
-// debugInfo has method to get args --- explore?!?!
-// getOperandPosition(instruction index, operand index (0,1,2))
 
-// TODO 1:
-// create method extractComment: parameter: string chunk, returns: list of comment strings
+  /* FOLLOWING METHODS: fixLeadingComments, fixFollowingComments
+    fixLeadingComments:
+    for given instruction: X, extract IR for X
+    extract positions of all instructions before X
+    extract string between, last instruction position before X to X
+   */
+  public String fixLeadingComments(){
+    return "";
+  }
+
+  public String fixFollowingComments(){
+    return "";
+  }
+}
+

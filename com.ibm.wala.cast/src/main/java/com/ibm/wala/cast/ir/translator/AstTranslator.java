@@ -591,90 +591,89 @@ public abstract class AstTranslator extends CAstVisitor<AstTranslator.WalkContex
               || (b.getLastLine() == a.getFirstLine() && b.getLastCol() < a.getFirstCol()));
     }
 
-    private String getComment(int instructionOffset, Function<Position, SortedSet<Position>> set)
+    private String getComment(int instructionOffset, Function<Position, SortedSet<Position>> set, boolean before)
         throws IOException {
       Position pos = getInstructionPosition(instructionOffset);
+      Set<Position> pos1= HashSetFactory.make();
       if (pos == null) {
         return null;
       } else {
-        SortedSet<Position> prevSet = set.apply(pos);
-        if (prevSet != null && !prevSet.isEmpty()) {
-          Position ppos = null;
-          for (Position other : prevSet) {
-            if (disjoint(other, pos)) {
-              ppos = other;
-              break;
+        for(int i = 0; i < instructionPositions.length; i++){
+          if (instructionPositions[i] != null) {
+            if (before
+                ? instructionPositions[i].getLastOffset() < pos.getFirstOffset()
+                : instructionPositions[i].getFirstOffset() > pos.getLastOffset()) {
+              pos1.add(instructionPositions[i]);
             }
           }
-          if (ppos == null) {
-            return null;
-          }
-          Position first, second;
-          if (ppos.compareTo(pos) < 0) {
-            first = ppos;
-            second = pos;
-          } else {
-            first = pos;
-            second = ppos;
-          }
-
-          Position intermediate =
-              new AbstractSourcePosition() {
-                @Override
-                public URL getURL() {
-                  return pos.getURL();
-                }
-
-                @Override
-                public Reader getReader() throws IOException {
-                  return pos.getReader();
-                }
-
-                @Override
-                public int getFirstLine() {
-                  return first.getLastLine();
-                }
-
-                @Override
-                public int getLastLine() {
-                  return second.getFirstLine();
-                }
-
-                @Override
-                public int getFirstCol() {
-                  return first.getLastCol();
-                }
-
-                @Override
-                public int getLastCol() {
-                  return second.getFirstCol();
-                }
-
-                @Override
-                public int getFirstOffset() {
-                  return first.getLastOffset();
-                }
-
-                @Override
-                public int getLastOffset() {
-                  return second.getFirstOffset();
-                }
-              };
-
-          return new SourceBuffer(intermediate).toString();
         }
+        Position code = this.codeBodyPosition;
+        int limit = before? code.getFirstOffset(): code.getLastOffset();
+        for(Position p: pos1){
+          if (before && p.getLastOffset() >limit){
+            limit = p.getLastOffset();
+          }
+          else if(!before && p.getFirstOffset() < limit){
+            limit  = p.getFirstOffset();
+          }
+        }
+        int bad = limit;
+        Position intermediate =
+            new AbstractSourcePosition() {
+              @Override
+              public URL getURL() {
+                return pos.getURL();
+              }
+
+              @Override
+              public Reader getReader() throws IOException {
+                return pos.getReader();
+              }
+
+              @Override
+              public int getFirstLine() {
+                return -1;
+              }
+
+              @Override
+              public int getLastLine() {
+                return -1;
+              }
+
+              @Override
+              public int getFirstCol() {
+                return -1;
+              }
+
+              @Override
+              public int getLastCol() {
+                return -1;
+              }
+
+              @Override
+              public int getFirstOffset() {
+                return before? bad: pos.getLastOffset();
+              }
+
+              @Override
+              public int getLastOffset() {
+                return before? pos.getFirstOffset():bad;
+              }
+            };
+
+        return new SourceBuffer(intermediate).toString();
       }
-      return null;
+
     }
 
     @Override
     public String getFollowingComment(int instructionOffset) throws IOException {
-      return getComment(instructionOffset, codePositions::tailSet);
+      return getComment(instructionOffset, codePositions::tailSet, false);
     }
 
     @Override
     public String getLeadingComment(int instructionOffset) throws IOException {
-      return getComment(instructionOffset, codePositions::headSet);
+      return getComment(instructionOffset, codePositions::headSet, true);
     }
   }
 

@@ -432,7 +432,7 @@ public class JavaCAst2IRTranslator extends AstTranslator {
     List<String> allComments = new Vector<>();
 
     while (true) {
-      if (allInstructions.length() <= 2) break;
+      if (allInstructions==null || allInstructions.length() <= 2) break;
 
       int i = allInstructions.indexOf("//");
       if (i == -1) {

@@ -62,6 +62,7 @@ public class CallFieldAccess {
     B b = new B();
     // return testGet for b
     return FieldAccess.testGet(unknown, b);
+    //end of function callGetExc
   }
 
   static B callDynamicGetException() {
@@ -71,5 +72,6 @@ public class CallFieldAccess {
     B b = new B();
     // return testGet
     return fad.testGet(unknown, b);
+    //end of function callDynamicExc
   }
 }
